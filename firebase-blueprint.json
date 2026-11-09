@@ -1,0 +1,577 @@
+{
+  "entities": {
+    "Order": {
+      "title": "Order",
+      "description": "Industrial Latina B2B commercial order with payment gateway status and inventory linkage.",
+      "type": "object",
+      "properties": {
+        "orderCode": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Unique order identifier code."
+        },
+        "clientName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120,
+          "description": "Legal name of the corporate client."
+        },
+        "clientNit": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 30,
+          "description": "Tax ID (NIT / RUC / RFC) of the corporate client."
+        },
+        "sku": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 40,
+          "description": "SKU code of the ordered industrial product."
+        },
+        "productName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 140,
+          "description": "Display name of the ordered product."
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Ordered units quantity."
+        },
+        "unitPrice": {
+          "type": "number",
+          "description": "Unit price in USD."
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Total order value in USD including taxes."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pendiente", "procesando", "enviado", "entregado", "cancelado"],
+          "description": "Fulfillment lifecycle state."
+        },
+        "paymentStatus": {
+          "type": "string",
+          "enum": ["pendiente", "pagado", "reembolsado"],
+          "description": "Payment gateway settlement status."
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["tarjeta_corporativa", "transferencia_spei", "credito_30d"],
+          "description": "Selected payment method."
+        },
+        "company": {
+          "type": "string",
+          "enum": ["industrial_latina", "induless"],
+          "minLength": 2,
+          "maxLength": 40,
+          "description": "Commercial brand fulfilling the order."
+        },
+        "digitalSellerCode": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 40,
+          "description": "Assigned digital seller code."
+        },
+        "cityEcuador": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80,
+          "description": "Destination city in Ecuador."
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "UID of the operator who created the order."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "orderCode",
+        "clientName",
+        "clientNit",
+        "sku",
+        "productName",
+        "quantity",
+        "unitPrice",
+        "totalAmount",
+        "status",
+        "paymentStatus",
+        "paymentMethod",
+        "ownerId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "description": "Real-time warehouse stock item for Industrial Latina.",
+      "type": "object",
+      "properties": {
+        "sku": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Unique industrial SKU identifier."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120,
+          "description": "Industrial part or machinery name."
+        },
+        "category": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 60,
+          "description": "Industrial category."
+        },
+        "warehouse": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 60,
+          "description": "Storage plant or distribution hub."
+        },
+        "stock": {
+          "type": "number",
+          "description": "Current available physical units."
+        },
+        "minStock": {
+          "type": "number",
+          "description": "Safety threshold triggering critical reorder alerts."
+        },
+        "unitPrice": {
+          "type": "number",
+          "description": "Unit commercial price in USD."
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20,
+          "description": "Measurement unit (Und, Ton, Bobina, Kit)."
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "UID of the responsible inventory manager."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "sku",
+        "name",
+        "category",
+        "warehouse",
+        "stock",
+        "minStock",
+        "unitPrice",
+        "unit",
+        "ownerId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Invoice": {
+      "title": "Invoice",
+      "description": "Digitally signed fiscal electronic invoice.",
+      "type": "object",
+      "properties": {
+        "invoiceNumber": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Official sequential fiscal invoice number."
+        },
+        "orderCode": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Associated order code."
+        },
+        "clientName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120,
+          "description": "Client legal name."
+        },
+        "clientNit": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 30,
+          "description": "Client tax identifier."
+        },
+        "subtotal": {
+          "type": "number",
+          "description": "Pre-tax amount in USD."
+        },
+        "taxAmount": {
+          "type": "number",
+          "description": "Calculated VAT (16%) in USD."
+        },
+        "total": {
+          "type": "number",
+          "description": "Grand total in USD."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["emitida", "pagada", "anulada"],
+          "description": "Fiscal lifecycle status."
+        },
+        "digitalSignature": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 128,
+          "description": "Cryptographic SHA-256 stamp."
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "UID of issuing user."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "invoiceNumber",
+        "orderCode",
+        "clientName",
+        "clientNit",
+        "subtotal",
+        "taxAmount",
+        "total",
+        "status",
+        "digitalSignature",
+        "ownerId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Shipment": {
+      "title": "Shipment",
+      "description": "Real-time logistics tracking record for online customer consultation.",
+      "type": "object",
+      "properties": {
+        "trackingCode": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Public tracking code."
+        },
+        "orderCode": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Linked commercial order code."
+        },
+        "clientName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120,
+          "description": "Recipient corporate client."
+        },
+        "origin": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100,
+          "description": "Origin industrial plant."
+        },
+        "destination": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100,
+          "description": "Destination facility."
+        },
+        "carrier": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80,
+          "description": "Assigned logistics fleet unit."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["preparacion", "control_calidad", "en_transito", "centro_distribucion", "entregado"],
+          "description": "Current logistics checkpoint."
+        },
+        "progress": {
+          "type": "number",
+          "description": "Completion percentage (0 to 100)."
+        },
+        "estimatedDelivery": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 40,
+          "description": "Estimated delivery date string."
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "UID of the logistics coordinator."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "trackingCode",
+        "orderCode",
+        "clientName",
+        "origin",
+        "destination",
+        "carrier",
+        "status",
+        "progress",
+        "estimatedDelivery",
+        "ownerId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "NotificationLog": {
+      "title": "NotificationLog",
+      "description": "Automated WhatsApp, Email, and critical real-time alert log.",
+      "type": "object",
+      "properties": {
+        "channel": {
+          "type": "string",
+          "enum": ["whatsapp", "email", "sistema_critico"],
+          "description": "Delivery channel."
+        },
+        "recipientName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120,
+          "description": "Recipient name or role."
+        },
+        "recipientTarget": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 120,
+          "description": "Destination identifier or masked contact."
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 160,
+          "description": "Notification title."
+        },
+        "message": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 500,
+          "description": "Notification body payload."
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["info", "alerta", "critica"],
+          "description": "Alert criticality level."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["enviado", "entregado", "fallido"],
+          "description": "Dispatch status."
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "UID of the creator."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        }
+      },
+      "required": [
+        "channel",
+        "recipientName",
+        "recipientTarget",
+        "subject",
+        "message",
+        "severity",
+        "status",
+        "ownerId",
+        "createdAt"
+      ]
+    },
+    "UserProfilePublic": {
+      "title": "UserProfilePublic",
+      "description": "Non-PII public profile and RBAC metadata for Industrial Latina operators.",
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100,
+          "description": "Operator full name."
+        },
+        "department": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 80,
+          "description": "Organizational unit."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["operador", "logistica", "finanzas", "cliente"],
+          "description": "Non-privileged role assignment."
+        },
+        "twoFactorEnabled": {
+          "type": "boolean",
+          "description": "Whether TOTP 2FA is active."
+        },
+        "e2eeKeyFingerprint": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 128,
+          "description": "Public fingerprint of the user E2EE key."
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Must match userId path variable and request.auth.uid."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "displayName",
+        "department",
+        "role",
+        "twoFactorEnabled",
+        "e2eeKeyFingerprint",
+        "ownerId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "UserProfilePrivate": {
+      "title": "UserProfilePrivate",
+      "description": "Isolated PII contact information accessible strictly to the owner or admin.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 5,
+          "maxLength": 120,
+          "description": "Corporate email address."
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 30,
+          "description": "WhatsApp / 2FA phone number."
+        },
+        "ownerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "UID of the user."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": ["email", "phone", "ownerId", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Commercial orders collection."
+    },
+    "/inventory/{itemId}": {
+      "schema": { "$ref": "#/entities/InventoryItem" },
+      "description": "Real-time warehouse inventory items."
+    },
+    "/invoices/{invoiceId}": {
+      "schema": { "$ref": "#/entities/Invoice" },
+      "description": "Electronic fiscal invoices."
+    },
+    "/shipments/{shipmentId}": {
+      "schema": { "$ref": "#/entities/Shipment" },
+      "description": "Logistics shipments for online tracking."
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/NotificationLog" },
+      "description": "Automated WhatsApp, Email, and critical alert records."
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfilePublic" },
+      "description": "Public user profiles without PII."
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": { "$ref": "#/entities/UserProfilePrivate" },
+      "description": "Isolated PII user profile data."
+    }
+  }
+}

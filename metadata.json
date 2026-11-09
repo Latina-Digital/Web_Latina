@@ -1,0 +1,11 @@
+{
+  "name": "Remix Remix Remix Industrial Latina ERP \u0026 Portal Logístico",
+  "description": "Plataforma empresarial integral para Industrial Latina: gestión de pedidos, inventario en tiempo real, facturación digital, rastreo de envíos, analítica predictiva con IA y control de accesos.",
+  "requestFramePermissions": [
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

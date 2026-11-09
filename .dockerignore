@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+coverage
+.git
+.aistudio
+*.log
+.DS_Store

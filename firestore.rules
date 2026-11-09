@@ -1,0 +1,362 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Default-Deny Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Core Primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isVerifiedUser() && request.auth.uid == userId;
+    }
+
+    function isSuperAdminEmail() {
+      return isVerifiedUser() && (
+        request.auth.token.email == 'xavierbriones68@gmail.com' ||
+        request.auth.token.email == 'industriallatina.digital@gmail.com'
+      );
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        isSuperAdminEmail() ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // 1. Order Validation Blueprint
+    function isValidOrder(data) {
+      return data.keys().hasAll([
+        'orderCode', 'clientName', 'clientNit', 'sku', 'productName',
+        'quantity', 'unitPrice', 'totalAmount', 'status',
+        'paymentStatus', 'paymentMethod', 'ownerId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'orderCode', 'clientName', 'clientNit', 'sku', 'productName',
+        'quantity', 'unitPrice', 'totalAmount', 'status',
+        'paymentStatus', 'paymentMethod', 'company', 'digitalSellerCode', 'cityEcuador',
+        'ownerId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.orderCode is string && data.orderCode.size() >= 3 && data.orderCode.size() <= 32 && data.orderCode.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.clientName is string && data.clientName.size() >= 2 && data.clientName.size() <= 120 &&
+      data.clientNit is string && data.clientNit.size() >= 4 && data.clientNit.size() <= 30 &&
+      data.sku is string && data.sku.size() >= 2 && data.sku.size() <= 40 &&
+      data.productName is string && data.productName.size() >= 2 && data.productName.size() <= 140 &&
+      data.quantity is number && data.quantity > 0 && data.quantity <= 1000000 &&
+      data.unitPrice is number && data.unitPrice >= 0 && data.unitPrice <= 100000000 &&
+      data.totalAmount is number && data.totalAmount >= 0 && data.totalAmount <= 1000000000 &&
+      data.status is string && data.status.size() <= 20 && data.status in ['pendiente', 'procesando', 'enviado', 'entregado', 'cancelado'] &&
+      data.paymentStatus is string && data.paymentStatus.size() <= 20 && data.paymentStatus in ['pendiente', 'pagado', 'reembolsado'] &&
+      data.paymentMethod is string && data.paymentMethod.size() <= 30 && data.paymentMethod in ['tarjeta_corporativa', 'transferencia_spei', 'credito_30d'] &&
+      (!('company' in data) || (data.company is string && data.company.size() >= 2 && data.company.size() <= 40 && data.company in ['industrial_latina', 'induless'])) &&
+      (!('digitalSellerCode' in data) || (data.digitalSellerCode is string && data.digitalSellerCode.size() >= 2 && data.digitalSellerCode.size() <= 40)) &&
+      (!('cityEcuador' in data) || (data.cityEcuador is string && data.cityEcuador.size() >= 2 && data.cityEcuador.size() <= 80)) &&
+      data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.ownerId == request.auth.uid &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // 2. InventoryItem Validation Blueprint
+    function isValidInventoryItem(data) {
+      return data.keys().hasAll([
+        'sku', 'name', 'category', 'warehouse', 'stock',
+        'minStock', 'unitPrice', 'unit', 'ownerId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'sku', 'name', 'category', 'warehouse', 'stock',
+        'minStock', 'unitPrice', 'unit', 'ownerId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.sku is string && data.sku.size() >= 3 && data.sku.size() <= 32 && data.sku.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.name is string && data.name.size() >= 2 && data.name.size() <= 120 &&
+      data.category is string && data.category.size() >= 2 && data.category.size() <= 60 &&
+      data.warehouse is string && data.warehouse.size() >= 2 && data.warehouse.size() <= 60 &&
+      data.stock is number && data.stock >= 0 && data.stock <= 10000000 &&
+      data.minStock is number && data.minStock >= 0 && data.minStock <= 1000000 &&
+      data.unitPrice is number && data.unitPrice >= 0 && data.unitPrice <= 100000000 &&
+      data.unit is string && data.unit.size() >= 1 && data.unit.size() <= 20 &&
+      data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.ownerId == request.auth.uid &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // 3. Invoice Validation Blueprint
+    function isValidInvoice(data) {
+      return data.keys().hasAll([
+        'invoiceNumber', 'orderCode', 'clientName', 'clientNit',
+        'subtotal', 'taxAmount', 'total', 'status',
+        'digitalSignature', 'ownerId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'invoiceNumber', 'orderCode', 'clientName', 'clientNit',
+        'subtotal', 'taxAmount', 'total', 'status',
+        'digitalSignature', 'ownerId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.invoiceNumber is string && data.invoiceNumber.size() >= 3 && data.invoiceNumber.size() <= 32 && data.invoiceNumber.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.orderCode is string && data.orderCode.size() >= 3 && data.orderCode.size() <= 32 && data.orderCode.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.clientName is string && data.clientName.size() >= 2 && data.clientName.size() <= 120 &&
+      data.clientNit is string && data.clientNit.size() >= 4 && data.clientNit.size() <= 30 &&
+      data.subtotal is number && data.subtotal >= 0 && data.subtotal <= 1000000000 &&
+      data.taxAmount is number && data.taxAmount >= 0 && data.taxAmount <= 1000000000 &&
+      data.total is number && data.total >= 0 && data.total <= 1000000000 &&
+      data.status is string && data.status.size() <= 20 && data.status in ['emitida', 'pagada', 'anulada'] &&
+      data.digitalSignature is string && data.digitalSignature.size() >= 8 && data.digitalSignature.size() <= 128 &&
+      data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.ownerId == request.auth.uid &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // 4. Shipment Validation Blueprint
+    function isValidShipment(data) {
+      return data.keys().hasAll([
+        'trackingCode', 'orderCode', 'clientName', 'origin', 'destination',
+        'carrier', 'status', 'progress', 'estimatedDelivery', 'ownerId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'trackingCode', 'orderCode', 'clientName', 'origin', 'destination',
+        'carrier', 'status', 'progress', 'estimatedDelivery', 'ownerId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.trackingCode is string && data.trackingCode.size() >= 4 && data.trackingCode.size() <= 32 && data.trackingCode.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.orderCode is string && data.orderCode.size() >= 3 && data.orderCode.size() <= 32 && data.orderCode.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.clientName is string && data.clientName.size() >= 2 && data.clientName.size() <= 120 &&
+      data.origin is string && data.origin.size() >= 2 && data.origin.size() <= 100 &&
+      data.destination is string && data.destination.size() >= 2 && data.destination.size() <= 100 &&
+      data.carrier is string && data.carrier.size() >= 2 && data.carrier.size() <= 80 &&
+      data.status is string && data.status.size() <= 30 && data.status in ['preparacion', 'control_calidad', 'en_transito', 'centro_distribucion', 'entregado'] &&
+      data.progress is number && data.progress >= 0 && data.progress <= 100 &&
+      data.estimatedDelivery is string && data.estimatedDelivery.size() >= 4 && data.estimatedDelivery.size() <= 40 &&
+      data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.ownerId == request.auth.uid &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // 5. NotificationLog Validation Blueprint
+    function isValidNotificationLog(data) {
+      return data.keys().hasAll([
+        'channel', 'recipientName', 'recipientTarget', 'subject',
+        'message', 'severity', 'status', 'ownerId', 'createdAt'
+      ]) &&
+      data.keys().hasOnly([
+        'channel', 'recipientName', 'recipientTarget', 'subject',
+        'message', 'severity', 'status', 'ownerId', 'createdAt'
+      ]) &&
+      data.channel is string && data.channel.size() <= 20 && data.channel in ['whatsapp', 'email', 'sistema_critico'] &&
+      data.recipientName is string && data.recipientName.size() >= 2 && data.recipientName.size() <= 120 &&
+      data.recipientTarget is string && data.recipientTarget.size() >= 3 && data.recipientTarget.size() <= 120 &&
+      data.subject is string && data.subject.size() >= 2 && data.subject.size() <= 160 &&
+      data.message is string && data.message.size() >= 2 && data.message.size() <= 500 &&
+      data.severity is string && data.severity.size() <= 20 && data.severity in ['info', 'alerta', 'critica'] &&
+      data.status is string && data.status.size() <= 20 && data.status in ['enviado', 'entregado', 'fallido'] &&
+      data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.ownerId == request.auth.uid &&
+      data.createdAt is timestamp;
+    }
+
+    // 6. UserProfilePublic Validation Blueprint (No PII, No self-assigned admin role)
+    function isValidUserProfilePublic(data) {
+      return data.keys().hasAll([
+        'displayName', 'department', 'role', 'twoFactorEnabled',
+        'e2eeKeyFingerprint', 'ownerId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'displayName', 'department', 'role', 'twoFactorEnabled',
+        'e2eeKeyFingerprint', 'ownerId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.displayName is string && data.displayName.size() >= 2 && data.displayName.size() <= 100 &&
+      data.department is string && data.department.size() >= 2 && data.department.size() <= 80 &&
+      data.role is string && data.role.size() <= 20 && data.role in ['operador', 'logistica', 'finanzas', 'cliente'] &&
+      data.twoFactorEnabled is bool &&
+      data.e2eeKeyFingerprint is string && data.e2eeKeyFingerprint.size() >= 8 && data.e2eeKeyFingerprint.size() <= 128 &&
+      data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.ownerId == request.auth.uid &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // 7. UserProfilePrivate Validation Blueprint (Isolated PII)
+    function isValidUserProfilePrivate(data) {
+      return data.keys().hasAll([
+        'email', 'phone', 'ownerId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'email', 'phone', 'ownerId', 'createdAt', 'updatedAt'
+      ]) &&
+      data.email is string && data.email.size() >= 5 && data.email.size() <= 120 &&
+      data.phone is string && data.phone.size() >= 6 && data.phone.size() <= 30 &&
+      data.ownerId is string && data.ownerId.size() >= 1 && data.ownerId.size() <= 128 && data.ownerId.matches('^[a-zA-Z0-9_\\-]+$') &&
+      data.ownerId == request.auth.uid &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // Admins Registry (Read-only for verification; managed strictly via console/backend)
+    match /admins/{adminId} {
+      allow get: if isValidId(adminId) && isOwner(adminId);
+      allow list, create, update, delete: if false;
+    }
+
+    // Connection Health Probe
+    match /test/{docId} {
+      allow read, write: if false;
+    }
+
+    // Collection: /orders/{orderId}
+    match /orders/{orderId} {
+      allow get: if isVerifiedUser() && isValidId(orderId) && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isVerifiedUser() && (existing().ownerId == request.auth.uid || isSuperAdminEmail());
+      allow create: if isVerifiedUser() && isValidId(orderId) && isValidOrder(incoming()) && incoming().createdAt == request.time && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser() && isValidId(orderId) && isValidOrder(incoming()) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          isAdmin() || (
+            existing().ownerId == request.auth.uid &&
+            !(existing().status in ['entregado', 'cancelado']) && (
+              // Action 1: Fulfillment Status Update
+              incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']) ||
+              // Action 2: Payment Settlement Update
+              incoming().diff(existing()).affectedKeys().hasOnly(['paymentStatus', 'paymentMethod', 'status', 'updatedAt'])
+            )
+          )
+        );
+      allow delete: if isVerifiedUser() && isValidId(orderId) && isAdmin();
+    }
+
+    // Collection: /inventory/{itemId}
+    match /inventory/{itemId} {
+      allow get: if isVerifiedUser() && isValidId(itemId) && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isVerifiedUser() && (existing().ownerId == request.auth.uid || isSuperAdminEmail());
+      allow create: if isVerifiedUser() && isValidId(itemId) && isValidInventoryItem(incoming()) && incoming().createdAt == request.time && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser() && isValidId(itemId) && isValidInventoryItem(incoming()) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().sku == existing().sku &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          isAdmin() || (
+            existing().ownerId == request.auth.uid && (
+              // Action 1: Stock Adjustment
+              incoming().diff(existing()).affectedKeys().hasOnly(['stock', 'updatedAt']) ||
+              // Action 2: Reorder Threshold or Price Update
+              incoming().diff(existing()).affectedKeys().hasOnly(['stock', 'minStock', 'unitPrice', 'warehouse', 'updatedAt'])
+            )
+          )
+        );
+      allow delete: if isVerifiedUser() && isValidId(itemId) && isAdmin();
+    }
+
+    // Collection: /invoices/{invoiceId}
+    match /invoices/{invoiceId} {
+      allow get: if isVerifiedUser() && isValidId(invoiceId) && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isVerifiedUser() && (existing().ownerId == request.auth.uid || isSuperAdminEmail());
+      allow create: if isVerifiedUser() && isValidId(invoiceId) && isValidInvoice(incoming()) && incoming().createdAt == request.time && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser() && isValidId(invoiceId) && isValidInvoice(incoming()) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().invoiceNumber == existing().invoiceNumber &&
+        incoming().orderCode == existing().orderCode &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          isAdmin() || (
+            existing().ownerId == request.auth.uid &&
+            !(existing().status in ['pagada', 'anulada']) &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+          )
+        );
+      allow delete: if isVerifiedUser() && isValidId(invoiceId) && isAdmin();
+    }
+
+    // Collection: /shipments/{shipmentId}
+    match /shipments/{shipmentId} {
+      allow get: if isVerifiedUser() && isValidId(shipmentId) && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isVerifiedUser() && (existing().ownerId == request.auth.uid || isSuperAdminEmail());
+      allow create: if isVerifiedUser() && isValidId(shipmentId) && isValidShipment(incoming()) && incoming().createdAt == request.time && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser() && isValidId(shipmentId) && isValidShipment(incoming()) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().trackingCode == existing().trackingCode &&
+        incoming().orderCode == existing().orderCode &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          isAdmin() || (
+            existing().ownerId == request.auth.uid &&
+            existing().status != 'entregado' &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['status', 'progress', 'estimatedDelivery', 'carrier', 'updatedAt'])
+          )
+        );
+      allow delete: if isVerifiedUser() && isValidId(shipmentId) && isAdmin();
+    }
+
+    // Collection: /notifications/{notificationId}
+    match /notifications/{notificationId} {
+      allow get: if isVerifiedUser() && isValidId(notificationId) && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isVerifiedUser() && (existing().ownerId == request.auth.uid || isSuperAdminEmail());
+      allow create: if isVerifiedUser() && isValidId(notificationId) && isValidNotificationLog(incoming()) && incoming().createdAt == request.time;
+      allow update: if false;
+      allow delete: if isVerifiedUser() && isValidId(notificationId) && isAdmin();
+    }
+
+    // Collection: /users/{userId} (Public Non-PII Profile)
+    match /users/{userId} {
+      allow get: if isVerifiedUser() && isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isVerifiedUser() && (existing().ownerId == request.auth.uid || isSuperAdminEmail());
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfilePublic(incoming()) &&
+        incoming().ownerId == userId &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser() && isValidId(userId) && isValidUserProfilePublic(incoming()) &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          isAdmin() || (
+            isOwner(userId) &&
+            incoming().role == existing().role &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'department', 'twoFactorEnabled', 'e2eeKeyFingerprint', 'updatedAt'])
+          )
+        );
+      allow delete: if isVerifiedUser() && isValidId(userId) && isAdmin();
+
+      // Subcollection: /users/{userId}/private/{docId} (Strict PII Isolation + Master Gate)
+      match /private/{docId} {
+        allow get: if isVerifiedUser() && isValidId(userId) && isValidId(docId) && (isOwner(userId) || isAdmin()) &&
+          get(/databases/$(database)/documents/users/$(userId)).data.ownerId == userId;
+        allow list: if isVerifiedUser() && (existing().ownerId == request.auth.uid || isSuperAdminEmail());
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(docId) && isValidUserProfilePrivate(incoming()) &&
+          incoming().ownerId == userId &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          get(/databases/$(database)/documents/users/$(userId)).data.ownerId == request.auth.uid;
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(docId) && isValidUserProfilePrivate(incoming()) &&
+          incoming().ownerId == existing().ownerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['email', 'phone', 'updatedAt']) &&
+          get(/databases/$(database)/documents/users/$(userId)).data.ownerId == request.auth.uid;
+        allow delete: if isVerifiedUser() && isValidId(userId) && isValidId(docId) && isAdmin();
+      }
+    }
+  }
+}

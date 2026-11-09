@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Industrial Latina ERP & Portal Logístico</title>
+    <meta name="description" content="Plataforma empresarial integral para Industrial Latina: gestión de pedidos, inventario en tiempo real, facturación digital, rastreo de envíos, analítica predictiva con IA y control de accesos." />
+    <meta property="og:title" content="Industrial Latina ERP & Portal Logístico" />
+    <meta property="og:description" content="Plataforma empresarial integral para Industrial Latina: gestión de pedidos, inventario en tiempo real, facturación digital, rastreo de envíos, analítica predictiva con IA y control de accesos." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@600;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <script>
+      (function () {
+        if (typeof window === 'undefined' || !window.WebSocket) return;
+        var NativeWebSocket = window.WebSocket;
+        function PatchedWebSocket(url, protocols) {
+          var isViteHmr =
+            protocols === 'vite-hmr' ||
+            (Array.isArray(protocols) && protocols.indexOf('vite-hmr') !== -1);
+          if (isViteHmr) {
+            return {
+              url: String(url || ''),
+              protocol: 'vite-hmr',
+              readyState: 1,
+              CONNECTING: 0,
+              OPEN: 1,
+              CLOSING: 2,
+              CLOSED: 3,
+              send: function () {},
+              close: function () {},
+              addEventListener: function (type, listener) {
+                if (type === 'open' && typeof listener === 'function') {
+                  setTimeout(function () {
+                    try {
+                      listener({ type: 'open' });
+                    } catch (_e) {}
+                  }, 0);
+                }
+              },
+              removeEventListener: function () {},
+              dispatchEvent: function () {
+                return true;
+              },
+            };
+          }
+          return protocols !== undefined
+            ? new NativeWebSocket(url, protocols)
+            : new NativeWebSocket(url);
+        }
+        PatchedWebSocket.prototype = NativeWebSocket.prototype;
+        PatchedWebSocket.CONNECTING = NativeWebSocket.CONNECTING;
+        PatchedWebSocket.OPEN = NativeWebSocket.OPEN;
+        PatchedWebSocket.CLOSING = NativeWebSocket.CLOSING;
+        PatchedWebSocket.CLOSED = NativeWebSocket.CLOSED;
+        window.WebSocket = PatchedWebSocket;
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

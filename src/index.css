@@ -1,0 +1,465 @@
+@import "tailwindcss";
+@import "./theme.css";
+
+@theme {
+  --color-il-blue: var(--il-blue-primary);
+  --color-il-blue-dark: var(--il-blue-dark);
+  --color-il-blue-deep: var(--il-blue-deep);
+  --color-il-blue-light: var(--il-blue-light);
+  --color-il-blue-soft: var(--il-blue-soft);
+  --color-il-yellow: var(--il-yellow-accent);
+  --color-il-yellow-bright: var(--il-yellow-bright);
+  --color-il-yellow-hover: var(--il-yellow-hover);
+  --color-il-red: var(--il-red-ribbon);
+  --color-il-canvas: var(--il-bg-canvas);
+  --color-induless-navy: var(--induless-navy);
+  --color-induless-magenta: var(--induless-magenta);
+  --color-induless-gold: var(--induless-gold);
+
+  --color-brand-navy: #0B2861;
+  --color-brand-yellow: #FFD100;
+  --color-brand-red: #E3000F;
+  --color-brand-light: #F8FAFC;
+}
+
+@layer base {
+  :root {
+    --font-display: 'Poppins', 'Plus Jakarta Sans', sans-serif;
+    --font-sans: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --theme-glow-rgba: rgba(11, 40, 97, 0.28);
+    --theme-bevel-rgba: rgba(255, 209, 0, 0.55);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    accent-color: var(--il-blue-primary);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--il-bg-canvas);
+    color: var(--il-text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--il-blue-primary);
+    color: var(--il-text-on-blue);
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  .font-mono, .tabular-nums {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--il-yellow-accent);
+    outline-offset: 1px;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+.hero-overlay {
+  background: linear-gradient(to right, rgba(11, 40, 97, 0.92) 0%, rgba(11, 40, 97, 0.45) 100%);
+}
+
+.img-zoom {
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.group:hover .img-zoom {
+  transform: scale(1.08);
+}
+
+@keyframes bounceSubtle {
+  0%, 100% {
+    transform: translateY(-4px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounceSubtle 1.5s ease-in-out 3;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* ============================================================================
+   1. ESTILO REALISTA 3D (ESKEUOMORFISMO & GLASSMORPHISM HIPERREALISTA)
+   ============================================================================ */
+
+/* Tarjetas 3D Flotantes con Cristal Esmerilado, Bordes Biselados y Sombras Multicapa */
+.skeuo-glass-card {
+  position: relative;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(248, 250, 252, 0.88) 55%,
+    rgba(241, 245, 249, 0.92) 100%
+  );
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 22px 44px -12px rgba(9, 36, 82, 0.22),
+    0 10px 20px -8px var(--theme-glow-rgba, rgba(11, 40, 97, 0.2)),
+    0 2px 5px rgba(15, 23, 42, 0.08),
+    inset 0 2px 2px rgba(255, 255, 255, 0.95),
+    inset 0 -3px 6px rgba(15, 23, 42, 0.06);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease;
+}
+
+.skeuo-glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 18% 12%,
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 255, 255, 0) 55%
+  );
+  z-index: 1;
+}
+
+.skeuo-glass-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow:
+    0 30px 60px -12px rgba(9, 36, 82, 0.30),
+    0 14px 28px -6px var(--theme-glow-rgba, rgba(11, 40, 97, 0.32)),
+    0 4px 10px rgba(15, 23, 42, 0.12),
+    inset 0 2px 3px rgba(255, 255, 255, 1),
+    inset 0 -3px 8px rgba(15, 23, 42, 0.09);
+}
+
+/* Paneles y Contenedores Esmerilados con Textura Sutil y Reflejo de Luz */
+.skeuo-glass-panel {
+  position: relative;
+  backdrop-filter: blur(20px) saturate(190%);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  box-shadow:
+    0 24px 48px -12px rgba(9, 36, 82, 0.24),
+    0 8px 20px -6px rgba(0, 0, 0, 0.12),
+    inset 0 2px 2px rgba(255, 255, 255, 0.65),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.14);
+}
+
+/* Pedestal 3D de Alta Definición para Logotipos Corporativos (Protagonismo Garantizado, Cero Interferencia 3D) */
+.logo-pedestal-3d {
+  position: relative;
+  z-index: 50 !important;
+  isolation: isolate;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+  border: 2px solid #FFFFFF;
+  outline: 1px solid rgba(11, 40, 97, 0.14);
+  box-shadow:
+    0 12px 28px -6px rgba(9, 36, 82, 0.22),
+    0 4px 10px -2px rgba(9, 36, 82, 0.14),
+    inset 0 2px 2px rgba(255, 255, 255, 1),
+    inset 0 -2px 4px rgba(14, 59, 124, 0.08);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+
+.logo-pedestal-3d:hover {
+  transform: translateY(-1.5px) scale(1.015);
+  box-shadow:
+    0 16px 32px -6px rgba(9, 36, 82, 0.28),
+    0 6px 12px -2px rgba(255, 209, 0, 0.35),
+    inset 0 2px 3px rgba(255, 255, 255, 1);
+}
+
+.logo-hd-render {
+  position: relative;
+  z-index: 51;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
+  filter: drop-shadow(0 2px 4px rgba(9, 36, 82, 0.16)) contrast(1.08) saturate(1.08);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Barra de Categoría de Alta Definición (Cero Interferencia de Figuras 3D) */
+.category-bar-hd {
+  position: relative;
+  z-index: 40 !important;
+  isolation: isolate;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+  border: 1.5px solid rgba(11, 40, 97, 0.16);
+  box-shadow:
+    0 14px 32px -8px rgba(9, 36, 82, 0.18),
+    0 4px 12px -2px rgba(15, 23, 42, 0.08),
+    inset 0 2px 2px rgba(255, 255, 255, 1);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Botones 3D con Relieve Realista (Eskeuomorfismo Táctil) */
+.skeuo-btn-3d {
+  position: relative;
+  box-shadow:
+    0 8px 18px -4px rgba(0, 0, 0, 0.28),
+    0 3px 6px -2px rgba(0, 0, 0, 0.18),
+    inset 0 2px 1.5px rgba(255, 255, 255, 0.55),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.26);
+  transition:
+    transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.18s ease,
+    filter 0.18s ease;
+}
+
+.skeuo-btn-3d:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow:
+    0 12px 24px -4px rgba(0, 0, 0, 0.34),
+    0 5px 10px -2px rgba(0, 0, 0, 0.22),
+    inset 0 2px 2px rgba(255, 255, 255, 0.72),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.28);
+}
+
+.skeuo-btn-3d:active {
+  transform: translateY(1.5px);
+  box-shadow:
+    0 3px 6px -2px rgba(0, 0, 0, 0.25),
+    inset 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+/* ============================================================================
+   2. ANIMACIONES DE DIBUJITOS VECTORIALES (SVG) Y MICROINTERACCIONES
+   ============================================================================ */
+
+@keyframes thematicFloat3d {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translateY(-6px) rotate(2.5deg) scale(1.03);
+  }
+  66% {
+    transform: translateY(-3px) rotate(-2deg) scale(1.01);
+  }
+}
+
+@keyframes thematicPulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.28)) drop-shadow(0 0 8px rgba(255, 209, 0, 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.36)) drop-shadow(0 0 18px rgba(255, 209, 0, 0.75));
+  }
+}
+
+.thematic-svg-animated {
+  animation:
+    thematicFloat3d 4.8s ease-in-out infinite,
+    thematicPulseGlow 3.6s ease-in-out infinite;
+  transform-origin: center center;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
+}
+
+.thematic-svg-animated:hover,
+.group:hover .thematic-svg-animated {
+  transform: translateY(-8px) scale(1.16) rotate(-6deg) !important;
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.42)) drop-shadow(0 0 22px rgba(255, 215, 0, 0.9)) !important;
+}
+
+/* ============================================================================
+   3. VENTANAS EMERGENTES (MODALS) CON EFECTO FÍSICO DE REBOTE (SPRING BOUNCE)
+   ============================================================================ */
+
+@keyframes modalSpringBounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.82) translateY(34px) perspective(900px) rotateX(8deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.035) translateY(-6px) perspective(900px) rotateX(-1.5deg);
+  }
+  82% {
+    transform: scale(0.99) translateY(2px) perspective(900px) rotateX(0.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) perspective(900px) rotateX(0deg);
+  }
+}
+
+@keyframes drawerSpringBounceIn {
+  0% {
+    opacity: 0;
+    transform: translateX(100%) scaleX(0.95);
+  }
+  68% {
+    opacity: 1;
+    transform: translateX(-12px) scaleX(1.01);
+  }
+  86% {
+    transform: translateX(4px) scaleX(0.998);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scaleX(1);
+  }
+}
+
+.skeuo-modal-3d {
+  position: relative;
+  z-index: 9999 !important;
+  isolation: isolate;
+  background-color: #FFFFFF !important;
+  animation: modalSpringBounceIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-shadow:
+    0 35px 70px -15px rgba(0, 0, 0, 0.62),
+    0 15px 35px -8px var(--theme-glow-rgba, rgba(11, 40, 97, 0.45)),
+    0 0 0 1px rgba(255, 255, 255, 0.95),
+    inset 0 2px 3px rgba(255, 255, 255, 0.95),
+    inset 0 -3px 8px rgba(15, 23, 42, 0.08);
+}
+
+.skeuo-drawer-3d {
+  position: relative;
+  z-index: 9999 !important;
+  isolation: isolate;
+  background-color: #FFFFFF !important;
+  animation: drawerSpringBounceIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  box-shadow:
+    -25px 0 65px -10px rgba(0, 0, 0, 0.58),
+    -8px 0 25px -4px var(--theme-glow-rgba, rgba(11, 40, 97, 0.35)),
+    inset 2px 0 2px rgba(255, 255, 255, 0.95);
+}
+
+/* ============================================================================
+   4. FIGURAS 3D CONMEMORATIVAS EN MOVIMIENTO Y REGLAS ESTRICTAS DE CAPAS
+   ============================================================================ */
+
+@keyframes commemorativeFloatPathA {
+  0%, 100% {
+    transform: perspective(900px) translate3d(0px, 0px, 0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+  }
+  25% {
+    transform: perspective(900px) translate3d(26px, -32px, 18px) rotateX(12deg) rotateY(-16deg) rotateZ(6deg) scale(1.06);
+  }
+  50% {
+    transform: perspective(900px) translate3d(-18px, -58px, -10px) rotateX(-8deg) rotateY(14deg) rotateZ(-5deg) scale(0.96);
+  }
+  75% {
+    transform: perspective(900px) translate3d(-30px, -22px, 12px) rotateX(10deg) rotateY(10deg) rotateZ(4deg) scale(1.03);
+  }
+}
+
+@keyframes commemorativeFloatPathB {
+  0%, 100% {
+    transform: perspective(900px) translate3d(0px, 0px, 0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+  }
+  33% {
+    transform: perspective(900px) translate3d(-34px, 28px, 20px) rotateX(-14deg) rotateY(18deg) rotateZ(-8deg) scale(1.08);
+  }
+  66% {
+    transform: perspective(900px) translate3d(24px, -36px, -14px) rotateX(12deg) rotateY(-14deg) rotateZ(7deg) scale(0.94);
+  }
+}
+
+@keyframes commemorativeFloatPathC {
+  0%, 100% {
+    transform: perspective(900px) translate3d(0px, 0px, 0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1);
+  }
+  30% {
+    transform: perspective(900px) translate3d(22px, 34px, 16px) rotateX(15deg) rotateY(12deg) rotateZ(9deg) scale(1.05);
+  }
+  70% {
+    transform: perspective(900px) translate3d(-28px, -28px, -12px) rotateX(-12deg) rotateY(-18deg) rotateZ(-6deg) scale(0.95);
+  }
+}
+
+.thematic-float-path-a {
+  animation: commemorativeFloatPathA 14s ease-in-out infinite;
+  will-change: transform;
+}
+
+.thematic-float-path-b {
+  animation: commemorativeFloatPathB 16.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.thematic-float-path-c {
+  animation: commemorativeFloatPathC 18.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Cero Interferencia al Seleccionar o Hacer Clic (pointer-events: none + user-select: none) */
+:root {
+  --z-ambient-3d-container: 10;
+  --z-erp-interactive-layer: 9999;
+  --z-erp-bar-layer: 9999;
+  --z-erp-modal-layer: 9999;
+}
+
+.thematic-ambient-root,
+[data-z-layer="ambient-3d"] {
+  z-index: var(--z-ambient-3d-container, 10) !important;
+}
+
+.thematic-ambient-root,
+.thematic-ambient-root *,
+.thematic-3d-figure,
+.thematic-3d-figure *,
+.thematic-svg-animated,
+.thematic-svg-animated *,
+.thematic-commemorative-banner,
+.thematic-commemorative-banner * {
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* Jerarquía de Capas Estricta Dinámica: Modals, Drawers, Barras Interactivas del ERP y Categorías en z-index: 9999 */
+.erp-interactive-bar,
+.category-bar-hd,
+.modal-layer-top,
+[data-z-layer="erp-bar"],
+[data-z-layer="erp-modal"],
+[data-z-layer="erp-interactive"],
+[role="dialog"] {
+  z-index: var(--z-erp-interactive-layer, 9999) !important;
+  isolation: isolate;
+}
+
+

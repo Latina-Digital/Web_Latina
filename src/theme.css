@@ -1,0 +1,137 @@
+/**
+ * Grupo Corporativo Ecuador: INDUSTRIAL LATINA & INDULESS
+ * Tokens oficiales extraídos de los Catálogos Oficiales Ecuador (Guayaquil - Quito - Cuenca)
+ */
+
+:root {
+  /* Entidad 1: INDUSTRIAL LATINA (Pinturas, Empastes, Morteros & Químicos de Construcción) */
+  --il-blue-primary: #0E3B7C;
+  --il-blue-dark: #092452;
+  --il-blue-deep: #061838;
+  --il-blue-light: #1D5BB8;
+  --il-blue-soft: #E8F0FC;
+  --il-blue-border: rgba(14, 59, 124, 0.16);
+
+  --il-red-ribbon: #D91E26;
+  --il-red-dark: #A81219;
+  --il-red-soft: #FDECEC;
+
+  --il-yellow-accent: #F5C400;
+  --il-yellow-bright: #FFD21F;
+  --il-yellow-hover: #E0B200;
+  --il-yellow-soft: #FEF9E6;
+
+  /* Entidad 2: INDULESS (Conductores CONDEX, Iluminación LED, Grifería, Cerraduras, Techoforte & Ferretería) */
+  --induless-navy: #13314C;
+  --induless-navy-dark: #0C2135;
+  --induless-magenta: #D8235A;
+  --induless-magenta-dark: #B01746;
+  --induless-magenta-soft: #FCEBF1;
+  --induless-gold: #F5B800;
+  --induless-cyan: #009FE3;
+  --induless-rainbow: linear-gradient(90deg, #E5243B 0%, #F59E0B 22%, #F5C400 45%, #10B981 68%, #009FE3 85%, #8B5CF6 100%);
+
+  /* Superficies y Fondos Corporativos Unificados */
+  --il-bg-canvas: #F3F6FA;
+  --il-bg-surface: #FFFFFF;
+  --il-bg-elevated: #F8FAFC;
+
+  /* Tipografía y Contraste de Texto */
+  --il-text-primary: #0F172A;
+  --il-text-secondary: #334155;
+  --il-text-muted: #64748B;
+  --il-text-on-blue: #FFFFFF;
+  --il-text-on-yellow: #092452;
+
+  /* Sombras Corporativas */
+  --il-shadow-card: 0 2px 10px -2px rgba(9, 36, 82, 0.08), 0 1px 3px -1px rgba(9, 36, 82, 0.05);
+  --il-shadow-elevated: 0 14px 30px -6px rgba(9, 36, 82, 0.15), 0 4px 12px -2px rgba(9, 36, 82, 0.08);
+}
+
+/* Clases utilitarias corporativas Industrial Latina & Induless */
+.il-bg-corporate {
+  background-color: var(--il-blue-primary);
+  color: var(--il-text-on-blue);
+}
+
+.il-bg-corporate-dark {
+  background-color: var(--il-blue-dark);
+  color: var(--il-text-on-blue);
+}
+
+.induless-bg-corporate {
+  background-color: var(--induless-navy);
+  color: #FFFFFF;
+}
+
+.induless-bg-magenta {
+  background-color: var(--induless-magenta);
+  color: #FFFFFF;
+}
+
+.induless-rainbow-bar {
+  background: var(--induless-rainbow);
+}
+
+.ec-dual-brand-gradient {
+  background: linear-gradient(135deg, var(--il-blue-deep) 0%, var(--il-blue-primary) 52%, var(--induless-navy) 100%);
+  color: #FFFFFF;
+}
+
+.il-bg-accent {
+  background-color: var(--il-yellow-accent);
+  color: var(--il-text-on-yellow);
+}
+
+.il-text-corporate {
+  color: var(--il-blue-primary);
+}
+
+.induless-text-magenta {
+  color: var(--induless-magenta);
+}
+
+.il-text-accent {
+  color: var(--il-yellow-accent);
+}
+
+.il-border-corporate {
+  border-color: var(--il-blue-border);
+}
+
+.il-card-surface {
+  background-color: var(--il-bg-surface);
+  border: 1px solid var(--il-blue-border);
+  box-shadow: var(--il-shadow-card);
+}
+
+.il-btn-primary {
+  background-color: var(--il-blue-primary);
+  color: var(--il-text-on-blue);
+  transition: background-color 150ms ease, transform 120ms ease;
+}
+
+.il-btn-primary:hover {
+  background-color: var(--il-blue-dark);
+}
+
+.induless-btn-primary {
+  background-color: var(--induless-magenta);
+  color: #FFFFFF;
+  transition: background-color 150ms ease, transform 120ms ease;
+}
+
+.induless-btn-primary:hover {
+  background-color: var(--induless-magenta-dark);
+}
+
+.il-btn-accent {
+  background-color: var(--il-yellow-accent);
+  color: var(--il-text-on-yellow);
+  font-weight: 700;
+  transition: background-color 150ms ease, transform 120ms ease;
+}
+
+.il-btn-accent:hover {
+  background-color: var(--il-yellow-hover);
+}
